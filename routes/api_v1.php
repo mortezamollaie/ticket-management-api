@@ -16,6 +16,11 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->apiResource('tickets', TicketController::class);
-Route::middleware('auth:sanctum')->apiResource('authors', AuthorsController::class);
-Route::middleware('auth:sanctum')->apiResource('authors.tickets', AuthorTicketsController::class);
+Route::middleware('auth:sanctum')->group(function () {
+    Route::apiResource('tickets', TicketController::class)->except(['update']);
+    Route::put('tickets/{ticket}', [TicketController::class, 'replace']);
+
+    Route::apiResource('authors', AuthorsController::class);
+    Route::apiResource('authors.tickets', AuthorTicketsController::class)->except(['update']);
+    Route::put('authors/{author}/tickets/{ticket}', [AuthorTicketsController::class, 'replace']);
+});

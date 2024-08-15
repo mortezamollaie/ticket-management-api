@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Filters\V1\TicketFilter;
+use App\Http\Requests\Api\V1\ReplaceTicketRequest;
 use App\Http\Requests\Api\V1\StoreTicketRequest;
 use App\Http\Requests\Api\V1\UpdateTicketRequest;
 use App\Http\Resources\V1\TicketResource;
@@ -57,14 +58,14 @@ class TicketController extends ApiController
      */
     public function show($ticket_id)
     {
-        try{
+        try {
             $ticket = Ticket::findOrFail($ticket_id);
 
-            if($this->include('author')){
+            if ($this->include('author')) {
                 return new TicketResource($ticket->load('user'));
             }
             return new TicketResource($ticket);
-        }catch(ModelNotFoundException $e){
+        } catch (ModelNotFoundException $e) {
             return $this->error('Ticket cannot be found.', 404);
         }
     }
@@ -80,9 +81,29 @@ class TicketController extends ApiController
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateTicketRequest $request, Ticket $ticket)
+    public function update(UpdateTicketRequest $request, $ticket_id)
     {
-        //
+        // PATCH
+    }
+
+    public function replace(ReplaceTicketRequest $request, $ticket_id)
+    {
+        try {
+            $ticket = Ticket::findOrFail($ticket_id);
+
+            $model = [
+                'title' => $request->input('data.attributes.title'),
+                'description' => $request->input('data.attributes.description'),
+                'status' => $request->input('data.attributes.status'),
+                'user_id' => $request->input('data.relationships.author.data.id'),
+            ];
+
+            $ticket->update($model);
+
+            return new TicketResource($ticket);
+        } catch (ModelNotFoundException $e) {
+            return $this->error('Ticket cannot be found.', 404);
+        }
     }
 
     /**
@@ -90,7 +111,7 @@ class TicketController extends ApiController
      */
     public function destroy($ticket_id)
     {
-        try{
+        try {
             $ticket = Ticket::findOrFail($ticket_id);
             $ticket->delete();
 
