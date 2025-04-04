@@ -2,7 +2,7 @@
 
 namespace App\ApiResponse;
 
-use Mortezamollaie\TasksManagement\ApiResponse\ApiResponse;
+use App\ApiResponse\ApiResponse;
 
 class ApiResponseBuilder
 {

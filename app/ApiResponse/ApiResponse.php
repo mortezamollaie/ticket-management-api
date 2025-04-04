@@ -33,7 +33,7 @@ class ApiResponse
     {
         $body = [];
         !is_null($this->message) && $body['message'] = $this->message;
-        !is_null($this->data) && $body['data'] = $this->data;
+        !($this->data == []) && $body['data'] = $this->data;
         $body = $body + $this->appends;
         return response()->json($body, $this->status);
     }
